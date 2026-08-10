@@ -1,0 +1,20 @@
+{
+  "name": "macos-activity-capture-spike",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Issue #1: macOSでアクティブウィンドウ・ブラウザURLを取得できるかの技術検証",
+  "type": "module",
+  "scripts": {
+    "capture": "tsx src/index.ts",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "active-win": "^8.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}
