@@ -10,6 +10,7 @@ import { dirname, join } from "node:path";
 import { getActiveWindowInfo } from "./activeWindow.js"; // アクティブウィンドウ取得
 import { getChromeTabInfo } from "./chromeTab.js"; // ChromeタブのURL取得
 import { appendActivityLog } from "./storage.js"; // ファイルへの保存
+import { isSameActivity } from "./dedupe.js"; // 前回と同じ内容かどうかの判定
 import type { ActivitySnapshot } from "./types.js";
 
 // このファイル自身がある場所を基準に、保存先ファイルのパスを組み立てる
@@ -45,6 +46,9 @@ async function captureOnce(): Promise<ActivitySnapshot | null> {
 // これまでに何回記録できたかのカウンター（終了時に件数を表示するために使う）
 let snapshotCount = 0;
 
+// 直前に記録した内容を覚えておくための変数（同じ内容の連続記録を防ぐため）
+let lastSnapshot: ActivitySnapshot | null = null;
+
 // タイマーが発火するたびに呼ばれる処理。1回分の取得→保存→ログ表示をする。
 async function tick(): Promise<void> {
   const snapshot = await captureOnce();
@@ -53,8 +57,16 @@ async function tick(): Promise<void> {
     console.warn("[capture] no active window info returned");
     return;
   }
+
+  // 直前に記録した内容と（timestamp以外が）同じなら、記録せずスキップする
+  // → 同じウィンドウを見続けている間に同じ内容の行が量産されるのを防ぐ
+  if (lastSnapshot && isSameActivity(lastSnapshot, snapshot)) {
+    return;
+  }
+
   // ファイルに1行追記
   appendActivityLog(LOG_FILE, snapshot);
+  lastSnapshot = snapshot;
   snapshotCount += 1;
   // ターミナルに今回取得した内容を表示（動作確認用）
   console.log(
