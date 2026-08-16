@@ -3,6 +3,31 @@
 [Issue #1](https://github.com/cs-noguchi/personal-activity-memory/issues/1) の技術検証用スクリプト。
 macOS上でアクティブアプリ名・ウィンドウタイトル・ChromeのタブURLが取得できるかを確認する。
 
+## 処理の流れ
+
+```mermaid
+flowchart TD
+    A[index.ts: 5秒ごとにtick実行] --> B[activeWindow.ts: アクティブアプリ/ウィンドウ取得]
+    B --> C{アプリ名がGoogle Chrome?}
+    C -- Yes --> D[chromeTab.ts: ChromeタブのURL取得]
+    C -- No --> E[chromeTabは取得しない]
+    D --> F[dedupe.ts: 前回と同じ内容か判定]
+    E --> F
+    F -- 同じ --> G[スキップ]
+    F -- 違う --> H[storage.ts: JSONLに1行追記]
+```
+
+各ファイルの役割:
+
+| ファイル | 役割 | 呼ばれるタイミング |
+| --- | --- | --- |
+| `src/index.ts` | 全体のループを回すエントリーポイント | `npm run capture` 実行時、常時 |
+| `src/activeWindow.ts` | アクティブアプリ名・ウィンドウタイトルを取得 | tickのたびに毎回 |
+| `src/chromeTab.ts` | ChromeのタブURL・タイトルを取得 | アクティブアプリがChromeの時だけ |
+| `src/dedupe.ts` | 前回記録した内容と同じか判定 | 取得後、保存する前に毎回 |
+| `src/storage.ts` | JSONLファイルへの追記 | 前回と内容が違うときだけ |
+| `src/types.ts` | データの型定義のみ（処理は無い） | - |
+
 ## セットアップ
 
 ```bash
