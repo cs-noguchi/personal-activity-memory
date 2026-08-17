@@ -1,10 +1,10 @@
-import { Test, TestingModule } from "@nestjs/testing";
-import { INestApplication } from "@nestjs/common";
-import request from "supertest";
-import { App } from "supertest/types";
-import { AppModule } from "./../src/app.module";
+import { Test, TestingModule } from '@nestjs/testing';
+import { INestApplication } from '@nestjs/common';
+import request from 'supertest';
+import { App } from 'supertest/types';
+import { AppModule } from './../src/app.module';
 
-describe("AppModule (e2e)", () => {
+describe('AppModule (e2e)', () => {
   let app: INestApplication<App>;
 
   beforeEach(async () => {
@@ -16,11 +16,11 @@ describe("AppModule (e2e)", () => {
     await app.init();
   });
 
-  it("/health (GET) はPostgreSQLへの接続成功を返す", () => {
+  it('/health (GET) はPostgreSQLへの接続成功を返す', () => {
     return request(app.getHttpServer())
-      .get("/health")
+      .get('/health')
       .expect(200)
-      .expect({ status: "ok", database: "connected" });
+      .expect({ status: 'ok', database: 'connected' });
   });
 
   afterEach(async () => {
