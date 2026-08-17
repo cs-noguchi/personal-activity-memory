@@ -67,3 +67,11 @@ npm test
 npm run test --workspace apps/api
 npm run test --workspace apps/web
 ```
+
+## Lint
+
+テストが通っていてもLintエラーが残っていることがあるため、PR前には必ず実行する。
+
+```bash
+npm run lint
+```
